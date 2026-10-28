@@ -2281,7 +2281,7 @@ if(!currentLedger())$('pointAdminStatus').textContent='고객을 선택한 뒤 �
  function openGuide(e){if(e){e.preventDefault();if(e.target&&e.target.blur)e.target.blur();}refresh();body.innerHTML='';
   const source=document.querySelector('#consultApplicationGuideSource .guide-master-panel[data-consult-guide="'+(guideMode==='realtime'?'realtime':'letter')+'"]');if(!source){hint.textContent='이용 안내를 불러오지 못했습니다.';return;}const clone=source.cloneNode(true);
   clone.querySelectorAll('.guide-group').forEach(g=>{if(g.id && g.id!==(guideMode==='realtime'?'aboutRealtime':'aboutLetter'))g.remove()});
-  body.appendChild(clone);document.getElementById('consultGuideTitle').textContent=guideMode==='realtime'?'상담 이용 안내':'비실시간 상담 이용 안내';modal.hidden=false;document.body.classList.add('guide-modal-open');
+  body.appendChild(clone);document.getElementById('consultGuideTitle').textContent=guideMode==='realtime'?'상담 이용 안내':'비실시간 상담 이용 안내';modal.hidden=false;document.body.classList.add('guide-modal-open');body.scrollTop=0;
  }
  function closeGuide(){modal.hidden=true;document.body.classList.remove('guide-modal-open');refresh();}
  openBtn.addEventListener('click',openGuide);
