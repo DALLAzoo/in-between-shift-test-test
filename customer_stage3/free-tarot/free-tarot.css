@@ -1,0 +1,25 @@
+/* 무료 타로 모듈 전용. 공통 스타일 수정 없이 독립 화면 구성 */
+#freeTarotRoot .ft-shell{position:relative;overflow:hidden;isolation:isolate;min-height:550px;border:1px solid rgba(230,187,105,.38);border-radius:22px;background:radial-gradient(ellipse at 50% 42%,#1d2736 0%,#0c111b 54%,#070a10 100%);color:#f7e9d1;padding:24px 14px 28px;text-align:center}
+#freeTarotRoot .ft-shell h2{margin:0 0 7px;font-size:clamp(20px,4vw,28px)}
+#freeTarotRoot .ft-note{font-size:13px;color:#c5bbab;margin:0;min-height:2.5em}
+#freeTarotRoot .ft-stage{height:355px;position:relative;max-width:620px;margin:8px auto 0;perspective:850px}
+#freeTarotRoot .ft-card{position:absolute;width:clamp(55px,13vw,82px);aspect-ratio:928/1593;top:50%;left:50%;border-radius:6px;background:#03090b url('./card-back.png') center/100% 100% no-repeat;box-shadow:0 8px 20px #0009,0 0 9px #e7b45d55;transform-style:preserve-3d;will-change:transform,opacity;pointer-events:none}
+#freeTarotRoot .ft-card.ft-floating{animation:ft-drift var(--dur) ease-in-out infinite alternate;animation-delay:var(--delay);transform:translate3d(var(--x),var(--y),var(--z)) rotate(var(--r));opacity:var(--alpha)}
+@keyframes ft-drift{from{transform:translate3d(var(--x),var(--y),var(--z)) rotate(var(--r))}to{transform:translate3d(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy)),var(--z)) rotate(calc(var(--r) + var(--dr)))}}
+#freeTarotRoot .ft-card.ft-gather{transition:transform 1.25s cubic-bezier(.24,.68,.18,1),opacity .7s ease;transform:translate3d(var(--tx),var(--ty),var(--tz)) rotate(var(--tr));opacity:1}
+#freeTarotRoot .ft-pile{position:absolute;top:50%;left:50%;width:clamp(73px,17vw,112px);aspect-ratio:928/1593;border:0;padding:0;background:none;transform:translate(-50%,-50%) translate(var(--px),var(--py)) rotate(var(--pr));cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s,transform .65s ease;filter:drop-shadow(0 8px 12px #000b)}
+#freeTarotRoot .ft-pile::before,#freeTarotRoot .ft-pile::after,#freeTarotRoot .ft-pile span{content:'';position:absolute;inset:0;border-radius:7px;background:#040909 url('./card-back.png') center/100% 100%;border:1px solid #a87528}
+#freeTarotRoot .ft-pile::before{transform:translate(-5px,6px) rotate(-3deg)}
+#freeTarotRoot .ft-pile::after{transform:translate(4px,3px) rotate(2deg)}
+#freeTarotRoot .ft-pile span{z-index:1}
+#freeTarotRoot .ft-shell[data-phase='choose'] .ft-pile{opacity:1;pointer-events:auto}
+#freeTarotRoot .ft-shell[data-phase='choose'] .ft-pile:hover,#freeTarotRoot .ft-shell[data-phase='choose'] .ft-pile:focus-visible{transform:translate(-50%,-50%) translate(var(--px),calc(var(--py) - 12px)) rotate(var(--pr));outline:2px solid #efcb87;outline-offset:6px}
+#freeTarotRoot .ft-shell[data-phase='choose'] .ft-card{opacity:0;transition:opacity .25s}
+#freeTarotRoot .ft-shell[data-phase='selected'] .ft-pile{opacity:0;pointer-events:none}
+#freeTarotRoot .ft-shell[data-phase='selected'] .ft-pile.ft-picked{opacity:1;transform:translate(-50%,-50%) scale(1.65) rotate(0deg)}
+#freeTarotRoot .ft-controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#freeTarotRoot .ft-action{border:1px solid #d9ac63;background:#29241e;color:#fff2d7;border-radius:999px;padding:11px 25px;font:inherit;cursor:pointer}
+#freeTarotRoot .ft-action:disabled{opacity:.45;cursor:wait}
+#freeTarotRoot .ft-action:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-width:420px){#freeTarotRoot .ft-shell{min-height:510px;padding:20px 8px}#freeTarotRoot .ft-stage{height:335px}}
+@media(prefers-reduced-motion:reduce){#freeTarotRoot .ft-card.ft-floating{animation:none}#freeTarotRoot .ft-card.ft-gather,#freeTarotRoot .ft-pile{transition-duration:.01ms}}
