@@ -2281,7 +2281,28 @@ if(!currentLedger())$('pointAdminStatus').textContent='고객을 선택한 뒤 �
   if(go)go.disabled=go.disabled||!finalCheck.checked;
   hint.hidden=!hint.textContent;
  }
- function openGuide(e){if(e){e.preventDefault();if(e.target&&e.target.blur)e.target.blur();}refresh();body.innerHTML='';
+   // AC1 isolated scroll test: mobile consultation guide only; no height or layout changes.
+  // Keep the document from receiving gestures that reach the guide's scroll boundaries.
+  let guideTouchY=0;
+  const guideIsMobile=()=>window.matchMedia('(max-width: 720px) and (pointer: coarse)').matches;
+  const guideScrollTarget=(node)=>node&&node.closest?node.closest('#consultGuideBody'):null;
+  modal.addEventListener('touchstart',e=>{
+    if(!guideIsMobile()||modal.hidden||!e.touches.length)return;
+    guideTouchY=e.touches[0].clientY;
+  },{passive:true});
+  modal.addEventListener('touchmove',e=>{
+    if(!guideIsMobile()||modal.hidden||!e.cancelable||e.touches.length!==1)return;
+    const scrollArea=guideScrollTarget(e.target);
+    if(!scrollArea){e.preventDefault();return;}
+    const nextY=e.touches[0].clientY;
+    const delta=nextY-guideTouchY;
+    guideTouchY=nextY;
+    const maxScroll=scrollArea.scrollHeight-scrollArea.clientHeight;
+    if(maxScroll<=1||(delta>0&&scrollArea.scrollTop<=0)||(delta<0&&scrollArea.scrollTop>=maxScroll-1)){
+      e.preventDefault();
+    }
+  },{passive:false});
+function openGuide(e){if(e){e.preventDefault();if(e.target&&e.target.blur)e.target.blur();}refresh();body.innerHTML='';
   const source=document.querySelector('#consultApplicationGuideSource .guide-master-panel[data-consult-guide="'+(guideMode==='realtime'?'realtime':'letter')+'"]');if(!source){hint.textContent='이용 안내를 불러오지 못했습니다.';return;}const clone=source.cloneNode(true);
   clone.querySelectorAll('.guide-group').forEach(g=>{if(g.id && g.id!==(guideMode==='realtime'?'aboutRealtime':'aboutLetter'))g.remove()});
   body.appendChild(clone);document.getElementById('consultGuideTitle').textContent=guideMode==='realtime'?'상담 이용 안내':'비실시간 상담 이용 안내';modal.hidden=false;document.body.classList.add('guide-modal-open');body.scrollTop=0;
@@ -2739,33 +2760,4 @@ if ('serviceWorker' in navigator) {
   visibility:visible!important;
 }
 </style>
-
-<script id="consult-guide-touch-isolation-v1">
-/* AC1: consult modal only; prevent touch gestures escaping the internal scroll area. */
-(function(){
-  'use strict';
-  var modal=document.getElementById('consultGuideModal');
-  var scroller=document.getElementById('consultGuideBody');
-  if(!modal||!scroller)return;
-  var lastY=null;
-  modal.addEventListener('touchstart',function(event){
-    if(modal.hidden||!event.touches.length)return;
-    lastY=event.touches[0].clientY;
-  },{passive:true});
-  modal.addEventListener('touchmove',function(event){
-    if(modal.hidden||!event.cancelable||!event.touches.length)return;
-    var currentY=event.touches[0].clientY;
-    var deltaY=lastY===null?0:currentY-lastY;
-    lastY=currentY;
-    if(event.touches.length!==1)return;
-    if(!scroller.contains(event.target)){event.preventDefault();return;}
-    var maxScroll=scroller.scrollHeight-scroller.clientHeight;
-    if(maxScroll<=1||(deltaY>0&&scroller.scrollTop<=1)||(deltaY<0&&scroller.scrollTop>=maxScroll-1)){
-      event.preventDefault();
-    }
-  },{passive:false});
-  modal.addEventListener('touchend',function(){lastY=null;},{passive:true});
-  modal.addEventListener('touchcancel',function(){lastY=null;},{passive:true});
-})();
-</script>
 </body></html>
