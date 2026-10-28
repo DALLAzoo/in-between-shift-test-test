@@ -422,7 +422,10 @@
 #prices .guide-action-hint[hidden]{display:none}
 .guide-modal[hidden]{display:none!important}
 .guide-modal{position:fixed;inset:0;z-index:9999;background:#08080bd9;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box}
-.guide-modal-dialog{width:min(680px,100%);max-height:90dvh;display:flex;flex-direction:column;border:1px solid #68cba7;border-radius:17px;background:#211e25;box-shadow:0 0 22px #57d49b48;overflow:hidden}
+.guide-modal-dialog{width:min(680px,100%);display:flex;flex-direction:column;border:1px solid #68cba7;border-radius:17px;background:#211e25;box-shadow:0 0 22px #57d49b48;overflow:hidden}
+/* 팝업별 높이 계산 분리: 공통 디자인은 위 규칙 유지 */
+#consultGuideModal .guide-modal-dialog{max-height:90svh}
+#writtenGuideModal .guide-modal-dialog{max-height:90dvh}
 .guide-modal-head,.guide-modal-foot{padding:15px 17px;background:#211e25;flex:none}
 .guide-modal-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #48424c}
 .guide-modal-head strong{font-size:17px;color:#fff}
