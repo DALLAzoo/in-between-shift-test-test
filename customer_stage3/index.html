@@ -2741,41 +2741,33 @@ if ('serviceWorker' in navigator) {
 </style>
 
 <!-- AC1 2026-10-29: KakaoTalk Android in-app consultation-guide stable-height isolated trial -->
-<style id="ac1-kakao-guide-height-trial">
-/* Scope only to the consultation guide in Android KakaoTalk in-app browser. */
-html.ac1-kakao-guide-height-trial #consultGuideModal.guide-modal{
-  align-items:flex-start;
-  padding-top:14px;
-}
-html.ac1-kakao-guide-height-trial #consultGuideModal .guide-modal-dialog{
-  height:var(--ac1-consult-frozen-height, 90svh);
-  max-height:var(--ac1-consult-frozen-height, 90svh);
+
+<style id="ac1-consult-fullscreen-mobile-trial">
+/* Mobile-only consultation guide fullscreen dialog trial; no other modals. */
+@media (max-width:720px) and (pointer:coarse) {
+  #consultGuideModal.guide-modal {
+    position:fixed; inset:0; padding:0; margin:0;
+    display:flex; align-items:stretch; justify-content:stretch;
+    overflow:hidden; overscroll-behavior:contain;
+  }
+  #consultGuideModal .guide-modal-dialog {
+    box-sizing:border-box; width:100%; height:100%; max-height:none;
+    min-height:0; margin:0; border-radius:0; border-left:0; border-right:0;
+    display:flex; flex-direction:column;
+    animation:ac1ConsultFullEnter .22s ease-out both;
+  }
+  #consultGuideModal .guide-modal-head {
+    flex:0 0 auto; padding-top:max(15px,env(safe-area-inset-top));
+  }
+  #consultGuideModal .guide-modal-body {
+    flex:1 1 auto; min-height:0; overflow-y:auto;
+    overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+  }
+  #consultGuideModal .guide-modal-foot {
+    flex:0 0 auto; padding-bottom:env(safe-area-inset-bottom, 0px);
+  }
+  @keyframes ac1ConsultFullEnter { from {transform:translateY(24px);opacity:.9} to {transform:translateY(0);opacity:1} }
+  @media (prefers-reduced-motion:reduce) { #consultGuideModal .guide-modal-dialog {animation:none} }
 }
 </style>
-<script id="ac1-kakao-guide-height-trial-js">
-(function(){
-  'use strict';
-  var ua=navigator.userAgent||'';
-  if(!/Android/i.test(ua)||!/KAKAOTALK/i.test(ua)||!/INAPP/i.test(ua))return;
-  var modal=document.getElementById('consultGuideModal');
-  if(!modal)return;
-  var dialog=modal.querySelector('.guide-modal-dialog');
-  if(!dialog)return;
-  document.documentElement.classList.add('ac1-kakao-guide-height-trial');
-  function sync(){
-    if(modal.hidden){dialog.style.removeProperty('--ac1-consult-frozen-height');return;}
-    if(dialog.style.getPropertyValue('--ac1-consult-frozen-height'))return;
-    /* Trial only: use a conservative once-per-open height, not resize-driven svh. */
-    var available=Math.max(0,window.innerHeight||0);
-    var screenHeight=Math.max(0,window.screen&&window.screen.height||0);
-    var candidates=[600];
-    if(screenHeight)candidates.push(Math.floor(screenHeight*0.71));
-    if(available)candidates.push(Math.floor(available-28));
-    var px=Math.max(240,Math.min.apply(Math,candidates));
-    dialog.style.setProperty('--ac1-consult-frozen-height',px+'px');
-  }
-  new MutationObserver(sync).observe(modal,{attributes:true,attributeFilter:['hidden']});
-  sync();
-})();
-</script>
 </body></html>
