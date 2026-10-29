@@ -2739,50 +2739,43 @@ if ('serviceWorker' in navigator) {
   visibility:visible!important;
 }
 </style>
-<script id="ac1-consult-guide-measurement-20261029">
-/* Diagnostic only. Enabled exclusively by ?guideMeasure=1; no remote transmission. */
+
+<!-- AC1 2026-10-29: KakaoTalk Android in-app consultation-guide stable-height isolated trial -->
+<style id="ac1-kakao-guide-height-trial">
+/* Scope only to the consultation guide in Android KakaoTalk in-app browser. */
+html.ac1-kakao-guide-height-trial #consultGuideModal.guide-modal{
+  align-items:flex-start;
+  padding-top:14px;
+}
+html.ac1-kakao-guide-height-trial #consultGuideModal .guide-modal-dialog{
+  height:var(--ac1-consult-frozen-height, 90svh);
+  max-height:var(--ac1-consult-frozen-height, 90svh);
+}
+</style>
+<script id="ac1-kakao-guide-height-trial-js">
 (function(){
- if(new URLSearchParams(location.search).get('guideMeasure')!=='1')return;
- const modal=document.getElementById('consultGuideModal');
- if(!modal)return;
- const dialog=modal.querySelector('.guide-modal-dialog');
- const body=modal.querySelector('.guide-modal-body');
- const vv=window.visualViewport;
- const events=[];let last=null, previous=null, lastSample=0, running=false;
- const panel=document.createElement('div');
- panel.id='ac1-guide-measure-panel';
- panel.style.cssText='position:fixed!important;z-index:2147483647!important;left:8px;right:8px;bottom:8px;background:#111e!important;color:white!important;border:1px solid #7fd4b6!important;border-radius:9px;padding:7px;font:12px/1.45 sans-serif;box-shadow:0 2px 14px #0008;max-height:32vh;overflow:auto;pointer-events:auto';
- panel.innerHTML='<div style="display:flex;gap:6px;align-items:center;justify-content:space-between"><b>팝업 진단 모드</b><button type="button" id="ac1-measure-copy">진단 결과 복사</button><button type="button" id="ac1-measure-hide">접기</button></div><div id="ac1-measure-status" style="white-space:pre-wrap;margin-top:4px">상담 이용 안내 팝업을 열어 주세요.</div><textarea id="ac1-measure-fallback" readonly style="display:none;width:100%;height:90px"></textarea>';
- document.body.appendChild(panel);
- const status=panel.querySelector('#ac1-measure-status');
- const copy=panel.querySelector('#ac1-measure-copy');
- const fallback=panel.querySelector('#ac1-measure-fallback');
- panel.querySelector('#ac1-measure-hide').addEventListener('click',()=>{const hide=status.style.display!=='none';status.style.display=hide?'none':'';fallback.style.display='none';panel.querySelector('#ac1-measure-hide').textContent=hide?'펼치기':'접기';});
- const round=n=>Number.isFinite(n)?Math.round(n*10)/10:null;
- function sample(reason){
-  if(modal.hidden)return;
-  const r=dialog.getBoundingClientRect(),outer=modal.getBoundingClientRect();
-  const computed=getComputedStyle(dialog);
-  const rec={t:Math.round(performance.now()),reason,top:round(r.top),bottom:round(r.bottom),height:round(r.height),outerTop:round(outer.top),outerBottom:round(outer.bottom),cssHeight:computed.height,cssMaxHeight:computed.maxHeight,innerHeight:innerHeight,visualHeight:vv?round(vv.height):null,visualTop:vv?round(vv.offsetTop):null,visualBottom:vv?round(vv.offsetTop+vv.height):null,pageScrollY:round(scrollY),bodyScrollTop:round(body.scrollTop),bodyScrollHeight:body.scrollHeight,bodyClientHeight:body.clientHeight};
-  if(!last||Math.abs(rec.height-last.height)>=1||Math.abs(rec.bottom-last.bottom)>=1||Math.abs(rec.visualHeight-last.visualHeight)>=1||Math.abs(rec.bodyScrollTop-last.bodyScrollTop)>=8||reason!=='poll'){
-   events.push(rec);if(events.length>240)events.shift();last=rec;
+  'use strict';
+  var ua=navigator.userAgent||'';
+  if(!/Android/i.test(ua)||!/KAKAOTALK/i.test(ua)||!/INAPP/i.test(ua))return;
+  var modal=document.getElementById('consultGuideModal');
+  if(!modal)return;
+  var dialog=modal.querySelector('.guide-modal-dialog');
+  if(!dialog)return;
+  document.documentElement.classList.add('ac1-kakao-guide-height-trial');
+  function sync(){
+    if(modal.hidden){dialog.style.removeProperty('--ac1-consult-frozen-height');return;}
+    if(dialog.style.getPropertyValue('--ac1-consult-frozen-height'))return;
+    /* Trial only: use a conservative once-per-open height, not resize-driven svh. */
+    var available=Math.max(0,window.innerHeight||0);
+    var screenHeight=Math.max(0,window.screen&&window.screen.height||0);
+    var candidates=[600];
+    if(screenHeight)candidates.push(Math.floor(screenHeight*0.71));
+    if(available)candidates.push(Math.floor(available-28));
+    var px=Math.max(240,Math.min.apply(Math,candidates));
+    dialog.style.setProperty('--ac1-consult-frozen-height',px+'px');
   }
-  const heights=events.map(x=>x.height),tops=events.map(x=>x.top),bottoms=events.map(x=>x.bottom);
-  status.textContent='기록 '+events.length+'개 | '+reason+'\n팝업 top '+rec.top+' / bottom '+rec.bottom+' / height '+rec.height+'px\n높이 범위 '+round(Math.min(...heights))+'~'+round(Math.max(...heights))+'px\n상단 범위 '+round(Math.min(...tops))+'~'+round(Math.max(...tops))+'px / 하단 범위 '+round(Math.min(...bottoms))+'~'+round(Math.max(...bottoms))+'px\n표시 영역 '+rec.visualHeight+'px / 문서 스크롤 '+rec.pageScrollY+'px';
-  previous=rec;
- }
- function loop(now){if(!running)return;if(now-lastSample>160){lastSample=now;sample('poll')}requestAnimationFrame(loop)}
- function ensure(){if(!modal.hidden&&!running){running=true;events.length=0;last=null;sample('opened');requestAnimationFrame(loop)}else if(modal.hidden&&running){sample('closed');running=false}}
- new MutationObserver(ensure).observe(modal,{attributes:true,attributeFilter:['hidden']});
- ['resize','scroll'].forEach(e=>window.addEventListener(e,()=>sample('window.'+e),{passive:true}));
- if(vv)['resize','scroll'].forEach(e=>vv.addEventListener(e,()=>sample('visualViewport.'+e),{passive:true}));
- body.addEventListener('scroll',()=>sample('body.scroll'),{passive:true});
- window.addEventListener('orientationchange',()=>sample('orientationchange'),{passive:true});
- copy.addEventListener('click',async()=>{
-  sample('copy');const data={label:'AC1 상담안내 모바일 자동측정',time:new Date().toISOString(),ua:navigator.userAgent,screen:{width:screen.width,height:screen.height},devicePixelRatio:devicePixelRatio,events};const txt=JSON.stringify(data,null,2);
-  try{await navigator.clipboard.writeText(txt);copy.textContent='복사 완료';}catch(e){fallback.style.display='block';fallback.value=txt;fallback.focus();fallback.select();copy.textContent='아래 텍스트 길게 눌러 복사';}
- });
- ensure();
+  new MutationObserver(sync).observe(modal,{attributes:true,attributeFilter:['hidden']});
+  sync();
 })();
 </script>
 </body></html>
