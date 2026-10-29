@@ -2300,7 +2300,20 @@ if(!currentLedger())$('pointAdminStatus').textContent='고객을 선택한 뒤 �
    document.body.style.right='';document.body.style.width='';
    window.scrollTo(0,y);
  }
- function closeGuide(){modal.hidden=true;document.body.classList.remove('guide-modal-open');ac1UnlockBackground();refresh();}
+ function closeGuide(){
+   // Release focus before removing the fixed-body scroll lock: WebView may scroll to the focused control.
+   if(document.activeElement && modal.contains(document.activeElement))document.activeElement.blur();
+   const savedY=ac1LockedY;
+   modal.hidden=true;
+   document.body.classList.remove('guide-modal-open');
+   ac1UnlockBackground();
+   refresh();
+   // Restore after synchronous layout updates and the next paint, without focusing the opener.
+   if(savedY!==null){
+     window.scrollTo({top:savedY,left:0,behavior:'instant'});
+     requestAnimationFrame(()=>window.scrollTo({top:savedY,left:0,behavior:'instant'}));
+   }
+ }
  openBtn.addEventListener('click',openGuide);
  document.querySelectorAll('[data-guide-open]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openGuide(e)},true));
  confirm.addEventListener('click',()=>{const checkbox=document.getElementById(guideMode==='realtime'?'realtimeAgreement':'letterAgreement');checkbox.checked=true;checkbox.dispatchEvent(new Event('change',{bubbles:true}));closeGuide();});
